@@ -13,32 +13,69 @@
   let showForm = false;
   let showSuccessDialog = false;
   let showErrorDialog = false;
+  let selectedFile = null;
 
   let formData = {
     Title: '',
     Description: '',
     Category: '',
-    Vote: 0
+    Vote: 0,
+    image: null
   };
+
+  function handleFileSelect(event) {
+    const file = event.target.files[0];
+    const maxSize = 5 * 1024 * 1024; // 5MB limit
+    
+    if (file) {
+      if (file.size > maxSize) {
+        alert('File size must be less than 5MB');
+        event.target.value = ''; // Reset input
+        return;
+      }
+      
+      if (!file.type.startsWith('image/')) {
+        alert('Only image files are allowed');
+        event.target.value = '';
+        return;
+      }
+      
+      selectedFile = file;
+      formData.image = file.name;
+    }
+  }
 
   async function Postdata(data) {
     try {
-      const response = await axios.post(`/api/${endpoint}`, data, {
+      const formDataObj = new FormData();
+      formDataObj.append('Title', data.Title);
+      formDataObj.append('Description', data.Description);
+      formDataObj.append('Category', data.Category);
+      formDataObj.append('Vote', data.Vote);
+      
+      if (selectedFile) {
+        formDataObj.append('image', selectedFile);
+      }
+
+      const response = await axios.post(`/api/${endpoint}`, formDataObj, {
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'multipart/form-data',
         },
       });
+      
       console.log('Feedback berhasil dikirim:', response.data);
 
       formData = {
         Title: '',
         Description: '',
         Category: '',
-        Vote: 0
+        Vote: 0,
+        image: null
       };
+      selectedFile = null;
       
       showSuccessDialog = true;
-      showForm = false; 
+      showForm = false;
     } catch (error) {
       console.error('Error saat mengirim feedback:', error);
       showErrorDialog = true;
@@ -59,19 +96,20 @@
       Title: '',
       Description: '',
       Category: '',
-      Vote: 0
+      Vote: 0,
+      image: null
     };
+    selectedFile = null;
   }
 </script>
 
 <div class="w-full bg-form rounded-lg border border-gray-600 p-4 mt-6">
   {#if !showForm}
-    <div class="flex  justify-between items-center">
-
+    <div class="flex justify-between items-center">
       <Label class="text-white">Share Your Feedback...</Label>
       <Button 
         on:click={() => showForm = true}
-        class="flex items-center gap-2  hover:bg-gray-800"
+        class="flex items-center gap-2 hover:bg-gray-800"
       >
         <Plus size={20} />
       </Button>
@@ -117,6 +155,25 @@
             </select>
           </div>
         {/if}
+
+        <!-- File Upload Input -->
+        <div class="space-y-2">
+          <label for="image" class="text-white">Upload Image</label>
+          <div class="flex items-center gap-2">
+            <Input 
+              id="image" 
+              type="file" 
+              accept="image/*" 
+              on:change={handleFileSelect}
+              class="bg-transparent border-0 text-white file:mr-4 file:py-2 file:px-4
+                     file:rounded-full file:border-0 file:text-sm file:font-semibold
+                     file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100"
+            />
+            {#if selectedFile}
+              <span class="text-sm text-gray-300">{selectedFile.name}</span>
+            {/if}
+          </div>
+        </div>
       </div>
 
       <div class="flex justify-end gap-2 pt-4 border-t border-gray-700">
