@@ -57,7 +57,7 @@
         formDataObj.append('image', selectedFile);
       }
 
-      const response = await axios.post(`/api/${endpoint}`, formDataObj, {
+      const response = await axios.post(`/api/${endpoint}_file`, formDataObj, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -65,20 +65,42 @@
       
       console.log('Feedback berhasil dikirim:', response.data);
 
-      formData = {
-        Title: '',
-        Description: '',
-        Category: '',
-        Vote: 0,
-        image: null
-      };
-      selectedFile = null;
-      
+      resetForm();
       showSuccessDialog = true;
-      showForm = false;
     } catch (error) {
       console.error('Error saat mengirim feedback:', error);
       showErrorDialog = true;
+    }
+  }
+
+  async function postDataWithoutFile(data) {
+    try {
+      const response = await axios.post(`/api/${endpoint}`, data, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      console.log('Feedback berhasil dikirim:', response.data);
+
+      resetForm();
+      showSuccessDialog = true;
+    } catch (error) {
+      console.error('Error saat mengirim feedback:', error);
+      showErrorDialog = true;
+    }
+  }
+
+  function handleSubmit() {
+    if (selectedFile) {
+      Postdata(formData);
+    } else {
+      postDataWithoutFile({
+        Title: formData.Title,
+        Description: formData.Description,
+        Category: formData.Category,
+        Vote: formData.Vote
+      });
     }
   }
 
@@ -91,7 +113,11 @@
   }
 
   function cancelForm() {
+    resetForm();
     showForm = false;
+  }
+
+  function resetForm() {
     formData = {
       Title: '',
       Description: '',
@@ -115,7 +141,7 @@
       </Button>
     </div>
   {:else}
-    <form on:submit|preventDefault={() => Postdata(formData)} class="space-y-4">
+    <form on:submit|preventDefault={handleSubmit} class="space-y-4">
       <div class="space-y-4">
         <div>
           <Input 
