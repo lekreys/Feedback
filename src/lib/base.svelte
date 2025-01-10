@@ -20,19 +20,6 @@
 <div class="justify-center">
 
     
-   <div class="flex justify-center mt-14">
-
-    <ul class="flex space-x-7">
-      <li class="text-gray-300 text-l cursor-pointer hover:text-violet-600"><a href="/feature_request">Feature Requests</a></li>
-      <li class="text-gray-300 text-l cursor-pointer hover:text-violet-600"><a href="/bugs">Bug Reports</a></li>
-      <li class="text-gray-300 text-l cursor-pointer hover:text-violet-600"><a href="/automations">Automations</a></li>
-      <li class="text-gray-300 text-l cursor-pointer hover:text-violet-600"><a href="/integrations">Integrations</a></li>
-      <li class="text-gray-300 text-l cursor-pointer hover:text-violet-600"><a href="/languages">Languages</a></li>
-      <li class="text-gray-300 text-l cursor-pointer hover:text-violet-600"><a href="/public_api">Public API</a></li>
-  
-  
-    </ul>
-  </div>
 
 
   <div class="flex justify-center">

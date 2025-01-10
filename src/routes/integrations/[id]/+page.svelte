@@ -11,7 +11,7 @@
 
 <div>
 
-    <Showdetail data={data.data} url="feature_request"></Showdetail>
+    <Showdetail data={data.data} url="integrations"></Showdetail>
 
 </div>
 

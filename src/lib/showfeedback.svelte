@@ -74,7 +74,7 @@
 
 
             <div class="w-11/12 h-24 overflow-hidden pt-2">
-              <a href="feature_request/{feed.id}">
+              <a href="{endpoint}/{feed.id}">
                 <Label class="text-md font-semibold block">{feed.Title}</Label>
               </a>
               <Label class="text-sm text-gray-400 block overflow-hidden whitespace-nowrap text-ellipsis">
