@@ -128,7 +128,6 @@
     selectedFile = null;
   }
 </script>
-
 <div class="w-full bg-form rounded-lg border border-gray-600 p-4 mt-6">
   {#if !showForm}
     <div class="flex justify-between items-center">
@@ -181,44 +180,51 @@
             </select>
           </div>
         {/if}
-
-        <!-- File Upload Input -->
-        <div class="space-y-2">
-          <label for="image" class="text-white">Upload Image</label>
-          <div class="flex items-center gap-2">
-            <Input 
-              id="image" 
-              type="file" 
-              accept="image/*" 
-              on:change={handleFileSelect}
-              class="bg-transparent border-0 text-white file:mr-4 file:py-2 file:px-4
-                     file:rounded-full file:border-0 file:text-sm file:font-semibold
-                     file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100"
-            />
-            {#if selectedFile}
-              <span class="text-sm text-gray-300">{selectedFile.name}</span>
-            {/if}
-          </div>
-        </div>
       </div>
 
-      <div class="flex justify-end gap-2 pt-4 border-t border-gray-700">
-        <Button 
-          type="button" 
-          variant="destructive" 
-          on:click={cancelForm}
-          class="text-white hover:bg-gray-800"
-        >
-          Cancel
-        </Button>
-        <Button type="submit" class="text-white">
-          Submit Feature
-        </Button>
+      <div class="flex justify-between items-center pt-4 border-t border-gray-700">
+        <!-- Left side: File Upload Input -->
+        <div class="flex items-center gap-2">
+          <input 
+            id="image" 
+            type="file" 
+            accept="image/*" 
+            on:change={handleFileSelect}
+            class="hidden"
+          />
+          <label 
+            for="image" 
+            class="cursor-pointer inline-flex items-center px-4 py-2 rounded-md text-sm font-medium
+                   bg-gray-700 text-white hover:bg-gray-600 focus:outline-none focus:ring-2 
+                   focus:ring-offset-2 focus:ring-gray-500"
+          >
+            {selectedFile ? 'Change Image' : 'Upload Image'}
+          </label>
+          {#if selectedFile}
+            <span class="text-sm text-gray-300 truncate max-w-[150px]">
+              {selectedFile.name}
+            </span>
+          {/if}
+        </div>
+
+        <!-- Right side: Action Buttons -->
+        <div class="flex gap-2">
+          <Button 
+            type="button" 
+            variant="destructive" 
+            on:click={cancelForm}
+            class="text-white hover:bg-gray-800"
+          >
+            Cancel
+          </Button>
+          <Button type="submit" class="text-white">
+            Submit Feature
+          </Button>
+        </div>
       </div>
     </form>
   {/if}
-</div>
-
+</div> 
 <AlertDialog.Root bind:open={showSuccessDialog}>
   <AlertDialog.Content class="sm:max-w-[425px] bg-gray-900 text-white border border-gray-700">
     <AlertDialog.Header>

@@ -68,13 +68,22 @@
   
     <div>
       {#each feedbackData || data_json.all_Feedback as feed, index}
+
+      
         <div class="text-white border-t-[0.5px] border-gray-500 px-5 py-2 flex justify-between">
-          <div class="w-11/12 h-24 overflow-hidden pt-2">
-            <Label class="text-md font-semibold block">{feed.Title}</Label>
-            <Label class="text-sm text-gray-400 block overflow-hidden whitespace-nowrap text-ellipsis">
-              {feed.Description}
-            </Label>
-          </div>
+
+
+            <div class="w-11/12 h-24 overflow-hidden pt-2">
+              <a href="feature_request/{feed.id}">
+                <Label class="text-md font-semibold block">{feed.Title}</Label>
+              </a>
+              <Label class="text-sm text-gray-400 block overflow-hidden whitespace-nowrap text-ellipsis">
+                {feed.Description}
+              </Label>
+            </div>
+
+        
+
   
           <Button
             on:click={() => toggleVote(feed, index)}
