@@ -13,35 +13,48 @@
   let showForm = false;
   let showSuccessDialog = false;
   let showErrorDialog = false;
-  let selectedFile = null;
+  let selectedFiles = [];
+  let totalSize = 0;
+  const MAX_FILES = 3; // Konstanta untuk batas maksimal file
 
   let formData = {
     Title: '',
     Description: '',
     Category: '',
-    Vote: 0,
-    image: null
+    Vote: 0
   };
 
   function handleFileSelect(event) {
-    const file = event.target.files[0];
+    const files = Array.from(event.target.files);
     const maxSize = 5 * 1024 * 1024; // 5MB limit
+    let totalNewSize = 0;
     
-    if (file) {
+    // Cek jika total file akan melebihi batas
+    if (selectedFiles.length + files.length > MAX_FILES) {
+      alert(`Maksimal ${MAX_FILES} gambar yang diperbolehkan`);
+      return;
+    }
+    
+    const validFiles = files.filter(file => {
       if (file.size > maxSize) {
-        alert('File size must be less than 5MB');
-        event.target.value = ''; // Reset input
-        return;
+        alert(`File ${file.name} melebihi ukuran 5MB`);
+        return false;
       }
-      
       if (!file.type.startsWith('image/')) {
-        alert('Only image files are allowed');
-        event.target.value = '';
-        return;
+        alert(`File ${file.name} bukan file gambar`);
+        return false;
       }
-      
-      selectedFile = file;
-      formData.image = file.name;
+      totalNewSize += file.size;
+      return true;
+    });
+
+    // Update selectedFiles dengan batas maksimal
+    const newSelectedFiles = [...selectedFiles, ...validFiles];
+    if (newSelectedFiles.length <= MAX_FILES) {
+      selectedFiles = newSelectedFiles;
+      totalSize = selectedFiles.reduce((acc, file) => acc + file.size, 0);
+    } else {
+      alert(`Maksimal ${MAX_FILES} gambar yang diperbolehkan`);
     }
   }
 
@@ -52,9 +65,11 @@
       formDataObj.append('Description', data.Description);
       formDataObj.append('Category', data.Category);
       formDataObj.append('Vote', data.Vote);
-      
-      if (selectedFile) {
-        formDataObj.append('image', selectedFile);
+
+      if (selectedFiles.length > 0) {
+        selectedFiles.forEach((file) => {
+          formDataObj.append('images', file);
+        });
       }
 
       const response = await axios.post(`/api/${endpoint}_file`, formDataObj, {
@@ -92,7 +107,7 @@
   }
 
   function handleSubmit() {
-    if (selectedFile) {
+    if (selectedFiles.length > 0) {
       Postdata(formData);
     } else {
       postDataWithoutFile({
@@ -122,12 +137,13 @@
       Title: '',
       Description: '',
       Category: '',
-      Vote: 0,
-      image: null
+      Vote: 0
     };
-    selectedFile = null;
+    selectedFiles = [];
+    totalSize = 0;
   }
 </script>
+
 <div class="w-full bg-form rounded-lg border border-gray-600 p-4 mt-6">
   {#if !showForm}
     <div class="flex justify-between items-center">
@@ -149,7 +165,7 @@
             bind:value={formData.Title} 
             placeholder="Short descriptive title" 
             required
-            class="bg-transparent border-0 text-white"
+            class="bg-transparent border-0 text-white w-full"
           />
         </div>
         
@@ -157,11 +173,10 @@
           <label for="description" class="text-white">Description</label>
           <Input 
             id="description" 
-            type="text" 
             bind:value={formData.Description} 
             placeholder="Any additional details..." 
             required
-            class="bg-transparent border-0 text-white"
+            class="w-full bg-transparent border-0 text-white p-2 rounded-md"
           />
         </div>
 
@@ -182,49 +197,83 @@
         {/if}
       </div>
 
-      <div class="flex justify-between items-center pt-4 border-t border-gray-700">
-        <!-- Left side: File Upload Input -->
-        <div class="flex items-center gap-2">
+      <div class="flex flex-col md:flex-row justify-between items-start pt-4 border-t border-gray-700 gap-4">
+        <div class="w-full md:w-2/3 space-y-3">
           <input 
             id="image" 
             type="file" 
             accept="image/*" 
+            multiple
             on:change={handleFileSelect}
             class="hidden"
           />
-          <label 
-            for="image" 
-            class="cursor-pointer inline-flex items-center px-4 py-2 rounded-md text-sm font-medium
-                   bg-gray-700 text-white hover:bg-gray-600 focus:outline-none focus:ring-2 
-                   focus:ring-offset-2 focus:ring-gray-500"
-          >
-            {selectedFile ? 'Change Image' : 'Upload Image'}
-          </label>
-          {#if selectedFile}
-            <span class="text-sm text-gray-300 truncate max-w-[150px]">
-              {selectedFile.name}
-            </span>
+          <div class="flex flex-wrap items-center gap-3">
+            <label 
+              for="image" 
+              class="cursor-pointer inline-flex items-center px-4 py-2 rounded-md text-sm font-medium
+                     bg-gray-700 text-white hover:bg-gray-600 focus:outline-none focus:ring-2 
+                     focus:ring-offset-2 focus:ring-gray-500 {selectedFiles.length >= MAX_FILES ? 'opacity-50 cursor-not-allowed' : ''}"
+              class:pointer-events-none={selectedFiles.length >= MAX_FILES}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              {selectedFiles.length > 0 ? `Change Images (${selectedFiles.length}/${MAX_FILES})` : 'Upload Images'}
+            </label>
+            {#if selectedFiles.length > 0}
+              <span class="text-sm text-gray-300">
+                {selectedFiles.length} of {MAX_FILES} file(s) selected
+              </span>
+            {/if}
+          </div>
+
+          {#if selectedFiles.length > 0}
+            <div class="bg-gray-800/50 rounded-lg p-2">
+              <div class="max-h-40 overflow-y-auto space-y-2">
+                {#each selectedFiles as file, i (i)}
+                  <div class="flex items-center justify-between gap-2 text-sm text-gray-300 p-2 bg-gray-800/50 rounded-md">
+                    <div class="flex items-center gap-2 min-w-0 flex-1">
+                      <span class="truncate">{file.name}</span>
+                      <span class="text-xs text-gray-400 whitespace-nowrap">({(file.size / 1024 / 1024).toFixed(2)} MB)</span>
+                    </div>
+                    <button
+                      type="button"
+                      class="text-red-400 hover:text-red-300 p-1"
+                      on:click={() => {
+                        selectedFiles = selectedFiles.filter((_, index) => index !== i);
+                        totalSize = selectedFiles.reduce((acc, file) => acc + file.size, 0);
+                      }}
+                    >
+                      ×
+                    </button>
+                  </div>
+                {/each}
+              </div>
+            </div>
           {/if}
         </div>
 
-        <!-- Right side: Action Buttons -->
-        <div class="flex gap-2">
+        <div class="flex gap-2 w-full md:w-auto">
           <Button 
             type="button" 
             variant="destructive" 
             on:click={cancelForm}
-            class="text-white hover:bg-gray-800"
+            class="flex-1 md:flex-initial text-white hover:bg-gray-800"
           >
             Cancel
           </Button>
-          <Button type="submit" class="text-white">
+          <Button 
+            type="submit" 
+            class="flex-1 md:flex-initial text-white"
+          >
             Submit Feature
           </Button>
         </div>
       </div>
     </form>
   {/if}
-</div> 
+</div>
+
 <AlertDialog.Root bind:open={showSuccessDialog}>
   <AlertDialog.Content class="sm:max-w-[425px] bg-gray-900 text-white border border-gray-700">
     <AlertDialog.Header>

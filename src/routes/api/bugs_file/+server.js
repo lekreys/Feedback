@@ -1,6 +1,5 @@
 import axios from 'axios';
 
-
 export async function POST({ request }) {
   try {
     // Ambil FormData dari request
@@ -15,14 +14,17 @@ export async function POST({ request }) {
     sendFormData.append('Category', formData.get('Category'));
     sendFormData.append('Vote', formData.get('Vote'));
     
-    // Append file jika ada
-    const imageFile = formData.get('image');
-    if (imageFile) {
-      sendFormData.append('image', imageFile);
+    // Ambil semua file yang diupload (bisa berupa banyak file)
+    const imageFiles = formData.getAll('images'); // Mengambil semua file dari field 'images'
+    if (imageFiles && imageFiles.length > 0) {
+      imageFiles.forEach((file) => {
+        sendFormData.append('images', file); // Tambahkan setiap file ke FormData
+      });
     }
 
     // Kirim request ke backend
-    const response = await axios.post('http://127.0.0.1:8000/bugs/upload-file', 
+    const response = await axios.post(
+      'http://127.0.0.1:8000/bugs/upload-file', 
       sendFormData,
       {
         headers: {
