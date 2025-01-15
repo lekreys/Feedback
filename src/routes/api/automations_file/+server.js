@@ -1,4 +1,9 @@
 import axios from 'axios';
+import { createApi } from "$lib/api";
+
+
+
+const api = createApi()
 
 export async function POST({ request }) {
   try {
@@ -23,8 +28,8 @@ export async function POST({ request }) {
     }
 
     // Kirim request ke backend
-    const response = await axios.post(
-      'http://127.0.0.1:8000/automations/upload-file', 
+    const response = await api.post(
+      '/automations/upload-file', 
       sendFormData,
       {
         headers: {

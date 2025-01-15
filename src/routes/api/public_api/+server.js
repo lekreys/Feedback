@@ -1,11 +1,16 @@
 import axios from 'axios';
+import { createApi } from "$lib/api";
+
+
+
+const api = createApi()
 
 export async function POST({ request }) {
 
   const data = await request.json(); 
 
   try {
-    const response = await axios.post('http://127.0.0.1:8000/public_api', data, {
+    const response = await api.post('/public_api', data, {
       headers: {
         'Content-Type': 'application/json',
       },
@@ -25,7 +30,7 @@ export async function POST({ request }) {
 
 export async function GET() {
   try {
-    const response = await axios.get('http://127.0.0.1:8000/public_api');
+    const response = await api.get('/public_api');
     return new Response(JSON.stringify(response.data));
   } catch (error) {
     console.error('Error fetching feedback:', error);

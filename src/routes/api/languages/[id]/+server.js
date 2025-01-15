@@ -1,4 +1,9 @@
 import axios from "axios";
+import { createApi } from "$lib/api";
+
+
+
+const api = createApi()
 
 export async function GET({ params }) {
   try {
@@ -6,7 +11,7 @@ export async function GET({ params }) {
     const { id } = params;
     
     // Lakukan request ke backend API (tersembunyi dari client)
-    const response = await axios.get(`http://127.0.0.1:8000/languages/${id}`);
+    const response = await api.get(`/languages/${id}`);
     
     // Return response dengan format JSON
     return new Response(JSON.stringify(response.data), {

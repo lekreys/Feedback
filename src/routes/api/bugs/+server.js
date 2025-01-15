@@ -1,4 +1,9 @@
 import axios from "axios";
+import { createApi } from "$lib/api";
+
+
+
+const api = createApi()
 
 
 export async function POST({ request }) {
@@ -6,7 +11,7 @@ export async function POST({ request }) {
     const data = await request.json(); 
   
     try {
-      const response = await axios.post('http://127.0.0.1:8000/bugs', data, {
+      const response = await api.post('/bugs', data, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -26,7 +31,7 @@ export async function POST({ request }) {
 
 export async function GET() {
     try {
-      const response = await axios.get('http://127.0.0.1:8000/bugs');
+      const response = await api.get('/bugs');
       return new Response(JSON.stringify(response.data));
     } catch (error) {
       console.error('Error fetching feedback:', error);
